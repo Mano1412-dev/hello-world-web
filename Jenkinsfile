@@ -12,7 +12,7 @@ pipeline {
         stage('Login Azure VM') {
             steps {
                 echo 'Testing SSH connection to Azure VM'
-                sshagent(credentials: ['azure-vm-dev-01']) {
+                sshagent(credentials: ['azure-vm-deploy-key']) {
                     sh '''
                        ssh -o BatchMode=yes \
                            -o ConnectTimeout=10 \
