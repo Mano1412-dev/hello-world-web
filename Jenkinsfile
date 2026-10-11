@@ -16,7 +16,7 @@ pipeline {
                     sh '''
                        ssh -o BatchMode=yes \
                            -o ConnectTimeout=10 \
-                           azureuser@20.41.232.96 \
+                           azureuser@10.20.1.4 \
                            "hostname"
                     '''
                 }
