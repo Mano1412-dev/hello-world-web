@@ -9,16 +9,17 @@ pipeline {
             }
         }
 
-        stage('Login Azure Vm') {
+        stage('Login Azure VM') {
             steps {
                 echo 'Testing SSH connection to Azure VM'
                 sshagent(credentials: ['azure-vm-dev-01']) {
                     sh '''
-                        ssh -o ConnectionTimeout=10 \
-                            azureuser@20.41.232.96
+                       ssh -o BatchMode=yes \
+                           -o ConnectTimeout=10 \
+                           azureuser@20.41.232.96 \
+                           "hostname"
                     '''
                 }
-
             }
         }
 
