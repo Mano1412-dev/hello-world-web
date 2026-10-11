@@ -23,6 +23,24 @@ pipeline {
             }
         }
 
+        stage('Deploy') {
+            steps {
+               sshagent(credentials: ['azure-vm-deploy-key']) {
+                   sh '''
+                      set -e
+                      echo 'Starting deployment'
+
+                      scp index.html azureuser@10.20.1.4:/tmp/index.html
+
+                      ssh azureuser@10.20.1.4 \
+                          "sudo cp /tmp/index.html /var/www/html/index.html"
+
+                      echo 'Deployment successful'
+                   '''
+                }
+            }
+        }
+
         
         
     }
