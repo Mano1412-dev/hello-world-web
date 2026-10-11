@@ -9,16 +9,20 @@ pipeline {
             }
         }
 
-        stage('Deploy to Azure VM') {
+        stage('Login Azure Vm') {
             steps {
+                echo 'Testing SSH connection to Azure VM'
                 sshagent(credentials: ['azure-vm-dev-01']) {
                     sh '''
-                       scp index.html azureuser@20.41.232.96:/tmp/index.html
-                       ssh azureuser@20.41.232.96 "sudo cp /tmp/index.html /var/www/html/index.html"
+                        ssh -o ConnectionTimeout=10 \
+                            azureuser@20.41.232.96
                     '''
                 }
+
             }
         }
+
+        
         
     }
 
