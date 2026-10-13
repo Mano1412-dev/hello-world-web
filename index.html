@@ -4,10 +4,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World Website</title>
+    <title>Hello World Microservice</title>
 </head>
 <body>
-    <h1>Hello World! version 3</h1>
-    <p>My first website for Azure DevOps practice.</p>
+    <h1>Hello World</h1>
+
+    <form id="nameForm">
+        <label for="name">Enter your name:</label>
+        <input id="name" name="name" maxlength="100" required>
+        <button type="submit">Submit</button>
+    </form>
+
+    <p id="result"></p>
+
+    <script>
+        document.getElementById("nameForm").addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const name = document.getElementById("name").value.trim();
+            const result = document.getElementById("result");
+            result.textContent = "Saving...";
+
+            try {
+                const response = await fetch("/update/api", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || "Request failed");
+                }
+
+                result.textContent = data.message;
+                document.getElementById("name").value = "";
+            } catch (error) {
+                result.textContent = "Error: " + error.message;
+            }
+        });
+    </script>
 </body>
 </html>
