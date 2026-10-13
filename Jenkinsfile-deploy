@@ -1,0 +1,73 @@
+
+pipeline {
+    agent any
+
+    options {
+        timestamps()
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'java -version'
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sshagent(credentials: ['azure-vm-deploy-key']) {
+                    sh '''
+                        set -eu
+
+                        JAR_FILE=$(find target -maxdepth 1 \
+                            -type f -name '*.jar' \
+                            ! -name '*.original' | head -n 1)
+
+                        test -n "$JAR_FILE"
+
+                        scp "$JAR_FILE" \
+                            azureuser@10.20.1.4:/tmp/app.jar
+
+                        scp index.html \
+                            azureuser@10.20.1.4:/tmp/index.html
+
+                        ssh azureuser@10.20.1.4 \
+                            "sudo -n /usr/local/sbin/deploy-hello-world-web"
+                    '''
+                }
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                sh '''
+                    set -eu
+                    sleep 5
+                    curl --fail --show-error \
+                        http://127.0.0.1/update/apihealth/check
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'SUCCESS: Build, deployment and health check passed.'
+        }
+
+        failure {
+            echo 'FAILURE: Check the Jenkins console output.'
+        }
+
+        always {
+            echo 'Pipeline execution finished.'
+        }
+    }
+}
