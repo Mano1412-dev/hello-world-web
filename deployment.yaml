@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-web
+  namespace: hello-world
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hello-world-web
+  template:
+    metadata:
+      labels:
+        app: hello-world-web
+    spec:
+      containers:
+        - name: hello-world-web
+          image: acrdevhelloworld.azurecr.io/hello-world-web:v1
+          ports:
+            - containerPort: 8081
